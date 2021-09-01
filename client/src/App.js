@@ -1,34 +1,31 @@
-import Home from "./pages/home/Home";
-import Login from "./pages/login/Login";
-import Profile from "./pages/profile/Profile";
-import Register from "./pages/register/Register";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "./context/AuthContext";
+import React from 'react';
+import { Container } from '@material-ui/core';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 
-function App() {
-  const { user } = useContext(AuthContext);
+import PostDetails from './components/PostDetails/PostDetails';
+import Navbar from './components/Navbar/Navbar';
+import Home from './components/Home/Home';
+import Auth from './components/Auth/Auth';
+import CreatorOrTag from './components/CreatorOrTag/CreatorOrTag';
+
+const App = () => {
+  const user = JSON.parse(localStorage.getItem('profile'));
+
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          {user ? <Home /> : <Register />}
-        </Route>
-        <Route path="/login">{user ? <Redirect to="/" /> : <Login />}</Route>
-        <Route path="/register">
-          {user ? <Redirect to="/" /> : <Register />}
-        </Route>
-        <Route path="/profile/:username">
-          <Profile />
-        </Route>
-      </Switch>
-    </Router>
+    <BrowserRouter>
+      <Container maxWidth="xl">
+        <Navbar />
+        <Switch>
+          <Route path="/" exact component={() => <Redirect to="/posts" />} />
+          <Route path="/posts" exact component={Home} />
+          <Route path="/posts/search" exact component={Home} />
+          <Route path="/posts/:id" exact component={PostDetails} />
+          <Route path={['/creators/:name', '/tags/:name']} component={CreatorOrTag} />
+          <Route path="/auth" exact component={() => (!user ? <Auth /> : <Redirect to="/posts" />)} />
+        </Switch>
+      </Container>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
